@@ -18,17 +18,17 @@ class JobController extends Controller
     /**
      * Lists all Job entities.
      *
-     */
+     */    
     public function indexAction()
     {
-        $em = $this->getDoctrine()->getManager();
-
-        $entities = $em->getRepository('EnsJobeetBundle:Job')->findAll();
+        $em = $this->getDoctrine()->getEntityManager();    
+        $entities = $em->getRepository('EnsJobeetBundle:Job')->getActiveJobs();
 
         return $this->render('EnsJobeetBundle:Job:index.html.twig', array(
-            'entities' => $entities,
+            'entities' => $entities
         ));
     }
+
     /**
      * Creates a new Job entity.
      *
