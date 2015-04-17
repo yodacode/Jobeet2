@@ -12,13 +12,18 @@ use Doctrine\ORM\EntityRepository;
  */
 class JobRepository extends EntityRepository
 {
-	public function getActiveJobs($category_id = null)
-	  {
+	public function getActiveJobs($category_id = null, $max = null)
+	{
 	    $qb = $this->createQueryBuilder('j')
 	      ->where('j.expires_at > :date')
 	      ->setParameter('date', date('Y-m-d H:i:s', time()))
 	      ->orderBy('j.expires_at', 'DESC');
-	 
+	 	
+	 	if($max)
+  		{
+    		$qb->setMaxResults($max);
+  		}
+
 	    if($category_id)
 	    {
 	      $qb->andWhere('j.category = :category_id')
@@ -29,4 +34,23 @@ class JobRepository extends EntityRepository
 	 
 	    return $query->getResult();
 	}
+
+    public function getActiveJob($id)
+    {
+      $query = $this->createQueryBuilder('j')
+        ->where('j.id = :id')
+        ->setParameter('id', $id)
+        ->andWhere('j.expires_at > :date')
+        ->setParameter('date', date('Y-m-d H:i:s', time()))
+        ->setMaxResults(1)
+        ->getQuery();
+     
+      try {
+        $job = $query->getSingleResult();
+      } catch (\Doctrine\Orm\NoResultException $e) {
+        $job = null;
+      }
+     
+      return $job;
+    }
 }
